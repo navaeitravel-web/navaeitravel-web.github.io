@@ -1,452 +1,49 @@
 <!doctype html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#243a64">
-  <meta name="description" content="دعوت‌نامه جشن عروسی رها و سپهر">
-  <title>دعوت‌نامه رها و سپهر</title>
-  <style>
-    :root {
-      --navy:#243a64;
-      --cream:#ebe3d2;
-      --cream-line:#e9dec7;
-      --text-dark:#171717;
-      --shadow: 0 18px 50px rgba(0,0,0,.12);
-    }
-
-    * { box-sizing:border-box; }
-    html {
-      scroll-behavior:smooth;
-      scroll-snap-type:y mandatory;
-    }
-    body {
-      margin:0;
-      background:var(--navy);
-      color:#fff;
-      font-family:Tahoma, Arial, sans-serif;
-      overflow-x:hidden;
-    }
-
-    .screen {
-      min-height:100svh;
-      display:grid;
-      place-items:center;
-      padding:0;
-      scroll-snap-align:start;
-      scroll-snap-stop:always;
-      position:relative;
-    }
-
-    .stage {
-      position:relative;
-      width:min(100vw, calc(100dvh * 1150 / 2048));
-      height:min(100dvh, calc(100vw * 2048 / 1150));
-      max-width:100vw;
-      max-height:100dvh;
-      overflow:hidden;
-      background:var(--cream);
-      box-shadow:var(--shadow);
-    }
-
-    .screen-image {
-      width:100%;
-      height:100%;
-      display:block;
-      object-fit:fill;
-      user-select:none;
-      -webkit-user-drag:none;
-      pointer-events:none;
-    }
-
-    #intro {
-      position:fixed;
-      inset:0;
-      z-index:100;
-      background:var(--navy);
-      display:grid;
-      place-items:center;
-      transition:opacity .85s ease, visibility .85s ease;
-    }
-
-    #intro.hide {
-      opacity:0;
-      visibility:hidden;
-      pointer-events:none;
-    }
-
-    #introButton {
-      border:0;
-      padding:0;
-      margin:0;
-      background:transparent;
-      width:min(100vw, calc(100dvh * 1150 / 2048));
-      height:min(100dvh, calc(100vw * 2048 / 1150));
-      cursor:pointer;
-      display:block;
-    }
-
-    #musicBtn {
-      position:fixed;
-      right:18px;
-      bottom:18px;
-      width:62px;
-      height:62px;
-      border-radius:50%;
-      border:2px solid var(--cream-line);
-      z-index:90;
-      background:rgba(36,58,100,.96);
-      box-shadow:0 10px 30px rgba(0,0,0,.22);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      transition:transform .22s ease, opacity .22s ease, box-shadow .22s ease;
-      overflow:hidden;
-    }
-    #musicBtn:hover {
-      transform:translateY(-2px) scale(1.04);
-      box-shadow:0 14px 34px rgba(0,0,0,.26);
-    }
-    #musicBtn::after {
-      content:"";
-      position:absolute;
-      inset:6px;
-      border-radius:50%;
-      border:1.5px solid rgba(233,222,199,.45);
-      pointer-events:none;
-    }
-
-    .music-state {
-      position:relative;
-      width:24px;
-      height:24px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .eq {
-      width:18px;
-      height:18px;
-      display:flex;
-      align-items:flex-end;
-      gap:2px;
-    }
-    .eq span {
-      width:3px;
-      height:30%;
-      background:#fff;
-      border-radius:2px;
-      animation:equalize 1.05s infinite ease-in-out;
-      transform-origin:bottom;
-    }
-    .eq span:nth-child(2) { animation-delay:.15s; }
-    .eq span:nth-child(3) { animation-delay:.3s; }
-
-    .noteIcon {
-      width:21px;
-      height:21px;
-      display:none;
-      fill:#fff;
-    }
-
-    #musicBtn.paused .eq { display:none; }
-    #musicBtn.paused .noteIcon { display:block; }
-
-    @keyframes equalize {
-      0%,100% { height:22%; }
-      25% { height:90%; }
-      50% { height:45%; }
-      75% { height:72%; }
-    }
-
-    #swipeHint {
-      position:fixed;
-      left:50%;
-      bottom:20px;
-      transform:translateX(-50%);
-      z-index:80;
-      width:64px;
-      height:82px;
-      border-radius:32px;
-      background:rgba(239,232,216,.92);
-      border:1px solid rgba(36,58,100,.18);
-      box-shadow:0 9px 28px rgba(0,0,0,.16);
-      display:grid;
-      place-items:center;
-      pointer-events:none;
-      opacity:1;
-      visibility:visible;
-      transition:opacity .55s ease, visibility .55s ease, transform .55s ease;
-      backdrop-filter:blur(4px);
-    }
-    #swipeHint.hidden {
-      opacity:0;
-      visibility:hidden;
-      transform:translateX(-50%) translateY(14px) scale(.94);
-    }
-
-    .swipeTrail {
-      position:absolute;
-      left:50%;
-      top:13px;
-      width:2px;
-      height:42px;
-      border-radius:2px;
-      transform:translateX(-50%);
-      background:linear-gradient(to top, rgba(20,20,20,0), rgba(20,20,20,.32));
-      animation:trailPulse 1.9s infinite cubic-bezier(.4,0,.2,1);
-    }
-
-    .swipePulse {
-      position:absolute;
-      left:50%;
-      bottom:17px;
-      width:20px;
-      height:20px;
-      margin-left:-10px;
-      border-radius:50%;
-      border:1.5px solid rgba(20,20,20,.38);
-      animation:touchPulse 1.9s infinite cubic-bezier(.4,0,.2,1);
-    }
-
-    .swipeHand {
-      position:absolute;
-      left:50%;
-      bottom:12px;
-      width:31px;
-      height:39px;
-      margin-left:-15.5px;
-      animation:swipeUp 1.9s infinite cubic-bezier(.4,0,.2,1);
-      filter:drop-shadow(0 2px 3px rgba(0,0,0,.12));
-    }
-    .swipeHand path,
-    .swipeHand line {
-      fill:#f8f3e9;
-      stroke:#171717;
-      stroke-width:1.8;
-      stroke-linecap:round;
-      stroke-linejoin:round;
-    }
-
-    @keyframes swipeUp {
-      0%   { transform:translateY(8px); opacity:0; }
-      15%  { opacity:1; }
-      65%  { transform:translateY(-31px); opacity:1; }
-      88%  { transform:translateY(-34px); opacity:0; }
-      100% { transform:translateY(8px); opacity:0; }
-    }
-    @keyframes touchPulse {
-      0%,8%   { transform:scale(.45); opacity:0; }
-      18%     { transform:scale(.75); opacity:.65; }
-      38%     { transform:scale(1.4); opacity:0; }
-      100%    { transform:scale(1.4); opacity:0; }
-    }
-    @keyframes trailPulse {
-      0%,18%  { opacity:0; transform:translateX(-50%) scaleY(.25); transform-origin:bottom; }
-      38%     { opacity:.6; }
-      72%     { opacity:.2; transform:translateX(-50%) scaleY(1); transform-origin:bottom; }
-      100%    { opacity:0; }
-    }
-
-    .page {
-      opacity:0;
-      transform:translateY(96px) scale(.94);
-      filter:blur(10px);
-      transition:
-        opacity 1.35s cubic-bezier(.22,.61,.36,1),
-        transform 1.35s cubic-bezier(.22,.61,.36,1),
-        filter 1.35s cubic-bezier(.22,.61,.36,1);
-      will-change:opacity, transform, filter;
-    }
-    .page.visible {
-      opacity:1;
-      transform:translateY(0) scale(1);
-      filter:blur(0);
-    }
-
-    .location-overlay {
-      position:absolute;
-      inset:0;
-      z-index:2;
-    }
-    .location-overlay a {
-      position:absolute;
-      left:20%;
-      top:54%;
-      width:60%;
-      height:25%;
-      border-radius:26px;
-      background:transparent;
-      cursor:pointer;
-    }
-
-    .top-fade {
-      position:fixed;
-      inset:0 0 auto 0;
-      height:14px;
-      background:linear-gradient(to bottom, rgba(36,58,100,.5), rgba(36,58,100,0));
-      z-index:50;
-      pointer-events:none;
-    }
-
-    @media (max-width:640px) {
-      #musicBtn {
-        right:14px;
-        bottom:14px;
-        width:58px;
-        height:58px;
-      }
-      #swipeHint {
-        bottom:14px;
-        width:60px;
-        height:78px;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#243a64">
+<meta name="description" content="دعوت‌نامه جشن عروسی رها و سپهر">
+<title>دعوت‌نامه رها و سپهر</title>
+<style>
+:root{--navy:#243a64;--cream:#ebe3d2;--cream-line:#e9dec7;--shadow:0 18px 50px rgba(0,0,0,.12)}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-snap-type:y mandatory}body{margin:0;background:var(--navy);color:#fff;font-family:Tahoma,Arial,sans-serif;overflow-x:hidden}.screen{min-height:100svh;display:grid;place-items:center;scroll-snap-align:start;scroll-snap-stop:always;position:relative}.stage{position:relative;width:min(100vw,calc(100dvh * 1150 / 2048));height:min(100dvh,calc(100vw * 2048 / 1150));max-width:100vw;max-height:100dvh;overflow:hidden;background:var(--cream);box-shadow:var(--shadow)}.screen-image{width:100%;height:100%;display:block;object-fit:fill;user-select:none;-webkit-user-drag:none;pointer-events:none}
+#intro{position:fixed;inset:0;z-index:100;background:var(--navy);display:grid;place-items:center;transition:opacity .85s ease,visibility .85s ease}#intro.hide{opacity:0;visibility:hidden;pointer-events:none}#introButton{border:0;padding:0;margin:0;background:transparent;width:min(100vw,calc(100dvh * 1150 / 2048));height:min(100dvh,calc(100vw * 2048 / 1150));cursor:pointer;display:block;touch-action:manipulation}
+#musicBtn{position:fixed;right:18px;bottom:18px;width:62px;height:62px;border-radius:50%;border:2px solid var(--cream-line);z-index:90;background:rgba(36,58,100,.96);box-shadow:0 10px 30px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}#musicBtn::after{content:"";position:absolute;inset:6px;border-radius:50%;border:1.5px solid rgba(233,222,199,.45);pointer-events:none}.music-state{position:relative;width:24px;height:24px;display:flex;align-items:center;justify-content:center}.eq{width:18px;height:18px;display:flex;align-items:flex-end;gap:2px}.eq span{width:3px;height:30%;background:#fff;border-radius:2px;animation:equalize 1.05s infinite ease-in-out}.eq span:nth-child(2){animation-delay:.15s}.eq span:nth-child(3){animation-delay:.3s}.noteIcon{width:21px;height:21px;display:none;fill:#fff}#musicBtn.paused .eq{display:none}#musicBtn.paused .noteIcon{display:block}@keyframes equalize{0%,100%{height:22%}25%{height:90%}50%{height:45%}75%{height:72%}}
+#swipeHint{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:80;width:64px;height:82px;border-radius:32px;background:rgba(239,232,216,.92);border:1px solid rgba(36,58,100,.18);box-shadow:0 9px 28px rgba(0,0,0,.16);display:grid;place-items:center;pointer-events:none;opacity:0;visibility:visible;transition:opacity .55s ease,visibility .55s ease,transform .55s ease}#swipeHint.hidden{opacity:0!important;visibility:hidden;transform:translateX(-50%) translateY(14px) scale(.94)}.swipeTrail{position:absolute;left:50%;top:13px;width:2px;height:42px;border-radius:2px;transform:translateX(-50%);background:linear-gradient(to top,rgba(20,20,20,0),rgba(20,20,20,.32));animation:trailPulse 1.9s infinite}.swipePulse{position:absolute;left:50%;bottom:17px;width:20px;height:20px;margin-left:-10px;border-radius:50%;border:1.5px solid rgba(20,20,20,.38);animation:touchPulse 1.9s infinite}.swipeHand{position:absolute;left:50%;bottom:12px;width:31px;height:39px;margin-left:-15.5px;animation:swipeUp 1.9s infinite;filter:drop-shadow(0 2px 3px rgba(0,0,0,.12))}.swipeHand path,.swipeHand line{fill:#f8f3e9;stroke:#171717;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}@keyframes swipeUp{0%{transform:translateY(8px);opacity:0}15%{opacity:1}65%{transform:translateY(-31px);opacity:1}88%{transform:translateY(-34px);opacity:0}100%{transform:translateY(8px);opacity:0}}@keyframes touchPulse{0%,8%{transform:scale(.45);opacity:0}18%{transform:scale(.75);opacity:.65}38%{transform:scale(1.4);opacity:0}100%{transform:scale(1.4);opacity:0}}@keyframes trailPulse{0%,18%{opacity:0;transform:translateX(-50%) scaleY(.25)}38%{opacity:.6}72%{opacity:.2;transform:translateX(-50%) scaleY(1)}100%{opacity:0}}
+.page{opacity:0;transform:translateY(96px) scale(.94);filter:blur(10px);transition:opacity 1.35s cubic-bezier(.22,.61,.36,1),transform 1.35s cubic-bezier(.22,.61,.36,1),filter 1.35s cubic-bezier(.22,.61,.36,1);will-change:opacity,transform,filter}.page.visible{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}.location-overlay{position:absolute;inset:0;z-index:2}.location-overlay a{position:absolute;left:20%;top:54%;width:60%;height:25%;border-radius:26px;background:transparent;cursor:pointer}.top-fade{position:fixed;inset:0 0 auto 0;height:14px;background:linear-gradient(to bottom,rgba(36,58,100,.5),rgba(36,58,100,0));z-index:50;pointer-events:none}@media(max-width:640px){#musicBtn{right:14px;bottom:14px;width:58px;height:58px}#swipeHint{bottom:14px;width:60px;height:78px}}
+</style>
 </head>
 <body>
-  <div id="intro" aria-label="صفحه آغاز">
-    <button id="introButton" type="button" aria-label="ورود به دعوت‌نامه">
-      <img class="screen-image" src="assets/first-screen.png" alt="دعوت نامه جشن عروسی رها و سپهر">
-    </button>
-  </div>
-
-  <div class="top-fade"></div>
-
-  <button id="musicBtn" class="paused" type="button" aria-label="پخش موزیک" title="موزیک">
-    <div class="music-state" aria-hidden="true">
-      <div class="eq">
-        <span></span><span></span><span></span>
-      </div>
-      <svg class="noteIcon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 3v11.55a3.5 3.5 0 1 0 2 3.15V8.69l6-1.5V4.63L12 6.6V3z"/>
-      </svg>
-    </div>
-  </button>
-
-  <div id="swipeHint" aria-hidden="true">
-    <div class="swipeTrail"></div>
-    <div class="swipePulse"></div>
-    <svg class="swipeHand" viewBox="0 0 32 42" aria-hidden="true">
-      <path d="M15.7 38.5c-3.2-1.8-5.7-4.2-7.5-7.2l-4.8-7.8c-.8-1.3-.4-3 1-3.8 1.2-.7 2.7-.4 3.6.7l2.3 3.1V8.2c0-1.7 1.2-3 2.8-3 1.6 0 2.8 1.3 2.8 3v9.4-5.1c0-1.6 1.2-2.8 2.7-2.8 1.5 0 2.7 1.2 2.7 2.8v5.8-3.8c0-1.5 1.1-2.7 2.6-2.7 1.5 0 2.6 1.2 2.6 2.7v5.2-2.7c0-1.4 1.1-2.5 2.5-2.5 1.4 0 2.5 1.1 2.5 2.5v9.1c0 5.8-2.3 9.8-6.8 12.4-3.5 2-6.3 2-9 .0z"/>
-      <line x1="13.1" y1="5.4" x2="13.1" y2="1.5"/>
-    </svg>
-  </div>
-
-  <audio id="bgMusic" preload="auto" loop>
-    <source src="assets/music.mp3" type="audio/mpeg">
-  </audio>
-
-  <main id="mainContent">
-    <section class="screen page" id="page2">
-      <div class="stage">
-        <img class="screen-image" src="assets/page-2.png" alt="صفحه دوم دعوت‌نامه">
-      </div>
-    </section>
-
-    <section class="screen page" id="page3">
-      <div class="stage">
-        <img class="screen-image" src="assets/page-3.png" alt="صفحه سوم دعوت‌نامه">
-      </div>
-    </section>
-
-    <section class="screen page" id="page4">
-      <div class="stage">
-        <img class="screen-image" src="assets/page-4.png" alt="صفحه چهارم دعوت‌نامه">
-      </div>
-    </section>
-
-    <section class="screen page" id="page5">
-      <div class="stage">
-        <img class="screen-image" src="assets/page-5.png" alt="صفحه پنجم دعوت‌نامه">
-      </div>
-    </section>
-
-    <section class="screen page" id="page6">
-      <div class="stage">
-        <img class="screen-image" src="assets/page-6.png" alt="صفحه ششم دعوت‌نامه">
-        <div class="location-overlay">
-          <a href="https://maps.app.goo.gl/43S5jx7tgR388KLE7" target="_blank" rel="noopener noreferrer" aria-label="نمایش لوکیشن مراسم"></a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    const intro = document.getElementById('intro');
-    const introButton = document.getElementById('introButton');
-    const bgMusic = document.getElementById('bgMusic');
-    const musicBtn = document.getElementById('musicBtn');
-    const swipeHint = document.getElementById('swipeHint');
-    const pages = document.querySelectorAll('.page');
-    let hasStarted = false;
-    let firstScrollHandled = false;
-    swipeHint.style.opacity = '0';
-
-    function setMusicUI(isPlaying) {
-      musicBtn.classList.toggle('paused', !isPlaying);
-      musicBtn.setAttribute('aria-label', isPlaying ? 'توقف موزیک' : 'پخش موزیک');
-      musicBtn.title = isPlaying ? 'توقف موزیک' : 'پخش موزیک';
-    }
-
-    async function startExperience() {
-      if (hasStarted) return;
-      hasStarted = true;
-      intro.classList.add('hide');
-      try {
-        bgMusic.currentTime = 0;
-        await bgMusic.play();
-        setMusicUI(true);
-      } catch (e) {
-        setMusicUI(false);
-      }
-      setTimeout(() => {
-        document.getElementById('page2').scrollIntoView({behavior:'smooth', block:'start'});
-      }, 120);
-      setTimeout(() => {
-        if (!firstScrollHandled) swipeHint.style.opacity = '1';
-      }, 950);
-    }
-
-    introButton.addEventListener('click', startExperience);
-
-    musicBtn.addEventListener('click', async () => {
-      if (bgMusic.paused) {
-        try {
-          await bgMusic.play();
-          setMusicUI(true);
-        } catch(e) {
-          setMusicUI(false);
-        }
-      } else {
-        bgMusic.pause();
-        setMusicUI(false);
-      }
-    });
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, {
-      threshold: 0.36
-    });
-
-    pages.forEach(page => observer.observe(page));
-    document.getElementById('page2').classList.add('visible');
-
-    function handleFirstScroll() {
-      if (!firstScrollHandled && window.scrollY > 40) {
-        firstScrollHandled = true;
-        swipeHint.classList.add('hidden');
-      }
-    }
-    window.addEventListener('scroll', handleFirstScroll, {passive:true});
-    handleFirstScroll();
-  </script>
+<div id="intro" aria-label="صفحه آغاز">
+<button id="introButton" type="button" aria-label="ورود به دعوت‌نامه" onclick="var i=document.getElementById('intro');var p2=document.getElementById('page2');var a=document.getElementById('bgMusic');var m=document.getElementById('musicBtn');if(p2){p2.classList.add('visible');}if(i){i.style.display='none';}if(a){try{var pp=a.play();if(pp&&pp.catch){pp.catch(function(){});}}catch(e){}}if(m&&!a.paused){m.classList.remove('paused');}return false;">
+<img class="screen-image" src="assets/first-screen.png" alt="دعوت نامه جشن عروسی رها و سپهر">
+</button>
+</div>
+<div class="top-fade"></div>
+<button id="musicBtn" class="paused" type="button" aria-label="پخش موزیک" title="موزیک"><div class="music-state" aria-hidden="true"><div class="eq"><span></span><span></span><span></span></div><svg class="noteIcon" viewBox="0 0 24 24"><path d="M12 3v11.55a3.5 3.5 0 1 0 2 3.15V8.69l6-1.5V4.63L12 6.6V3z"/></svg></div></button>
+<div id="swipeHint" aria-hidden="true"><div class="swipeTrail"></div><div class="swipePulse"></div><svg class="swipeHand" viewBox="0 0 32 42"><path d="M15.7 38.5c-3.2-1.8-5.7-4.2-7.5-7.2l-4.8-7.8c-.8-1.3-.4-3 1-3.8 1.2-.7 2.7-.4 3.6.7l2.3 3.1V8.2c0-1.7 1.2-3 2.8-3 1.6 0 2.8 1.3 2.8 3v9.4-5.1c0-1.6 1.2-2.8 2.7-2.8 1.5 0 2.7 1.2 2.7 2.8v5.8-3.8c0-1.5 1.1-2.7 2.6-2.7 1.5 0 2.6 1.2 2.6 2.7v5.2-2.7c0-1.4 1.1-2.5 2.5-2.5 1.4 0 2.5 1.1 2.5 2.5v9.1c0 5.8-2.3 9.8-6.8 12.4-3.5 2-6.3 2-9 .0z"/><line x1="13.1" y1="5.4" x2="13.1" y2="1.5"/></svg></div>
+<audio id="bgMusic" preload="auto" loop><source src="assets/music.mp3" type="audio/mpeg"></audio>
+<main id="mainContent">
+<section class="screen page" id="page2"><div class="stage"><img class="screen-image" src="assets/page-2.png" alt="صفحه دوم دعوت‌نامه"></div></section>
+<section class="screen page" id="page3"><div class="stage"><img class="screen-image" src="assets/page-3.png" alt="صفحه سوم دعوت‌نامه"></div></section>
+<section class="screen page" id="page4"><div class="stage"><img class="screen-image" src="assets/page-4.png" alt="صفحه چهارم دعوت‌نامه"></div></section>
+<section class="screen page" id="page5"><div class="stage"><img class="screen-image" src="assets/page-5.png" alt="صفحه پنجم دعوت‌نامه"></div></section>
+<section class="screen page" id="page6"><div class="stage"><img class="screen-image" src="assets/page-6.png" alt="صفحه ششم دعوت‌نامه"><div class="location-overlay"><a href="https://maps.app.goo.gl/43S5jx7tgR388KLE7" target="_blank" rel="noopener noreferrer" aria-label="نمایش لوکیشن مراسم"></a></div></div></section>
+</main>
+<script>
+(function(){
+var intro=document.getElementById('intro'),introButton=document.getElementById('introButton'),bgMusic=document.getElementById('bgMusic'),musicBtn=document.getElementById('musicBtn'),swipeHint=document.getElementById('swipeHint'),pages=document.querySelectorAll('.page');
+var started=false,ignoreScrollUntil=0,hintGone=false;
+function setMusicUI(on){if(!musicBtn)return;musicBtn.classList.toggle('paused',!on);musicBtn.setAttribute('aria-label',on?'توقف موزیک':'پخش موزیک');musicBtn.title=on?'توقف موزیک':'پخش موزیک';}
+function enter(){if(started)return;started=true;if(document.getElementById('page2'))document.getElementById('page2').classList.add('visible');if(intro){intro.classList.add('hide');setTimeout(function(){intro.style.display='none';},850);}try{bgMusic.currentTime=0;var p=bgMusic.play();if(p&&p.then){p.then(function(){setMusicUI(true);}).catch(function(){setMusicUI(false);});}else{setMusicUI(!bgMusic.paused);}}catch(e){setMusicUI(false);}ignoreScrollUntil=Date.now()+1200;setTimeout(function(){if(!hintGone){swipeHint.style.opacity='1';}},950);}
+if(introButton){introButton.addEventListener('click',enter);introButton.addEventListener('touchend',enter,{passive:true});}
+if(intro){intro.addEventListener('click',function(e){if(e.target===intro)enter();});}
+if(musicBtn){musicBtn.addEventListener('click',function(){if(bgMusic.paused){try{var p=bgMusic.play();if(p&&p.then){p.then(function(){setMusicUI(true);}).catch(function(){setMusicUI(false);});}else setMusicUI(true);}catch(e){setMusicUI(false);}}else{bgMusic.pause();setMusicUI(false);}});}
+if('IntersectionObserver' in window){var ob=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.28});for(var i=0;i<pages.length;i++)ob.observe(pages[i]);}else{for(var j=0;j<pages.length;j++)pages[j].classList.add('visible');}
+window.addEventListener('scroll',function(){if(Date.now()<ignoreScrollUntil)return;if(!hintGone&&window.scrollY>40){hintGone=true;swipeHint.classList.add('hidden');}},{passive:true});
+})();
+</script>
 </body>
 </html>
