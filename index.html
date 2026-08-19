@@ -86,7 +86,6 @@
       display:block;
     }
 
-    /* Floating music button */
     #musicBtn {
       position:fixed;
       right:18px;
@@ -162,7 +161,6 @@
       75% { height:72%; }
     }
 
-    /* Swipe-up teaching gesture */
     #swipeHint {
       position:fixed;
       left:50%;
@@ -252,7 +250,6 @@
       100%    { opacity:0; }
     }
 
-    /* Stronger, slower page transition */
     .page {
       opacity:0;
       transform:translateY(96px) scale(.94);
@@ -312,7 +309,7 @@
 <body>
   <div id="intro" aria-label="صفحه آغاز">
     <button id="introButton" type="button" aria-label="ورود به دعوت‌نامه"
-      onclick="var intro=document.getElementById('intro'); if(intro) intro.style.display='none'; var p2=document.getElementById('page2'); if(p2) p2.scrollIntoView({behavior:'smooth', block:'start'}); var a=document.getElementById('bgMusic'); if(a){ var pp=a.play(); if(pp&&pp.catch){ pp.catch(function(){}); } } var m=document.getElementById('musicBtn'); if(m){ m.classList.remove('paused'); } var h=document.getElementById('swipeHint'); if(h){ h.style.opacity='1'; } return false;">
+      onclick="var intro=document.getElementById('intro'); if(intro) intro.style.display='none'; var p2=document.getElementById('page2'); if(p2) p2.scrollIntoView({behavior:'smooth', block:'start'}); var a=document.getElementById('bgMusic'); if(a){ var pp=a.play(); if(pp&&pp.catch){ pp.catch(function(){}); } } var m=document.getElementById('musicBtn'); if(m){ m.classList.remove('paused'); } var h=document.getElementById('swipeHint'); if(h){ h.classList.remove('hidden'); h.style.opacity='1'; } return false;">
       <img class="screen-image" src="assets/first-screen.png" alt="دعوت نامه جشن عروسی رها و سپهر">
     </button>
   </div>
@@ -387,7 +384,6 @@
     const pages = document.querySelectorAll('.page');
     let hasStarted = false;
     let firstScrollHandled = false;
-    swipeHint.style.opacity = '0';
 
     function setMusicUI(isPlaying) {
       musicBtn.classList.toggle('paused', !isPlaying);
@@ -412,10 +408,6 @@
       } catch (e) {
         setMusicUI(false);
       }
-
-      setTimeout(() => {
-        if (!firstScrollHandled) swipeHint.style.opacity = '1';
-      }, 950);
     }
 
     introButton.addEventListener('click', startExperience);
@@ -447,22 +439,35 @@
     pages.forEach(page => observer.observe(page));
     document.getElementById('page2').classList.add('visible');
 
-    function handleFirstScroll() {
-      if (!firstScrollHandled && window.scrollY > 40) {
+    let touchStartY = null;
+
+    function hideSwipeHint() {
+      if (!firstScrollHandled) {
         firstScrollHandled = true;
         swipeHint.classList.add('hidden');
       }
     }
-    window.addEventListener('scroll', handleFirstScroll, {passive:true});
-    handleFirstScroll();
 
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const introHidden = intro.classList.contains('hide') || getComputedStyle(intro).display === 'none';
-        if (introHidden && !firstScrollHandled) {
-          swipeHint.style.opacity = '1';
-        }
-      }, 600);
+    window.addEventListener('touchstart', (event) => {
+      if (!hasStarted || !event.touches || !event.touches.length) return;
+      touchStartY = event.touches[0].clientY;
+    }, {passive:true});
+
+    window.addEventListener('touchmove', (event) => {
+      if (!hasStarted || touchStartY === null || !event.touches || !event.touches.length) return;
+      const deltaY = event.touches[0].clientY - touchStartY;
+      if (Math.abs(deltaY) > 18) hideSwipeHint();
+    }, {passive:true});
+
+    window.addEventListener('wheel', () => {
+      if (hasStarted) hideSwipeHint();
+    }, {passive:true});
+
+    window.addEventListener('keydown', (event) => {
+      if (!hasStarted) return;
+      if (['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(event.key)) {
+        hideSwipeHint();
+      }
     });
   </script>
 </body>
